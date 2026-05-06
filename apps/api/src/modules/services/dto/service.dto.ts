@@ -7,10 +7,14 @@ import {
   Max,
   MaxLength,
   IsBoolean,
+  IsUUID,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateServiceDto {
+  @IsUUID()
+  barberId: string;
+
   @IsString()
   @MaxLength(100)
   name: string;
@@ -26,7 +30,7 @@ export class CreateServiceDto {
   durationMinutes: number;
 
   @Type(() => Number)
-  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsNumber()
   @Min(0)
   price: number;
 }
@@ -50,7 +54,7 @@ export class UpdateServiceDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsNumber({ maxDecimalPlaces: 2 })
+  @IsNumber()
   @Min(0)
   price?: number;
 

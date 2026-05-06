@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { ValidationPipe, Logger, RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -15,13 +15,30 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const port = configService.get<number>('PORT', 3001);
   const frontendUrl = configService.get<string>('FRONTEND_URL', 'http://localhost:3000');
+ 
+  // ── Root Redirect & API Handler ─────────────────────────────────────────────
+  app.getHttpAdapter().get('/', (req: any, res: any) => {
+    res.redirect(frontendUrl);
+  });
+
+  app.use('/api/v1', (req: any, res: any, next: any) => {
+    if (req.url === '/' || req.url === '') {
+      return res.status(200).json({
+        success: true,
+        message: 'Vaon API is running!',
+        portal: `Visit the Landing Page at ${frontendUrl}`,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    next();
+  });
 
   // ── CORS ────────────────────────────────────────────────────────────────────
   app.enableCors({
     origin: [frontendUrl, /\.barberos\.app$/],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-Slug'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // ── Global prefix ───────────────────────────────────────────────────────────

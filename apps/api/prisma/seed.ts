@@ -1,98 +1,55 @@
 import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
 
-  const passwordHash = await bcrypt.hash('admin123', 12);
-
-  const tenant = await prisma.tenant.upsert({
-    where: { slug: 'barberia-demo' },
-    update: {},
-    create: {
-      slug: 'barberia-demo',
-      name: 'Barbería Demo Central',
-      address: 'Av. Corrientes 1234, CABA',
-      phone: '+541144445555',
-    },
-  });
-
-  const adminUser = await prisma.user.upsert({
-    where: { tenantId_email: { tenantId: tenant.id, email: 'admin@barberia.demo' } },
-    update: {},
-    create: {
-      tenantId: tenant.id,
-      email: 'admin@barberia.demo',
-      firstName: 'Admin',
-      lastName: 'Demo',
-      passwordHash,
-      role: 'ADMIN',
-    },
-  });
-
-  const barberUser = await prisma.user.upsert({
-    where: { tenantId_email: { tenantId: tenant.id, email: 'juan@barberia.demo' } },
-    update: {},
-    create: {
-      tenantId: tenant.id,
-      email: 'juan@barberia.demo',
-      firstName: 'Juan',
-      lastName: 'Pérez',
-      passwordHash,
-      role: 'BARBER',
-    },
-  });
-
+  // 1. Create Barber
   const barber = await prisma.barber.upsert({
-    where: { userId: barberUser.id },
+    where: { id: 'barber-1' },
     update: {},
     create: {
-      tenantId: tenant.id,
-      userId: barberUser.id,
-      displayName: 'Juan Pérez',
-      bio: 'Especialista en degradados y barba.',
+      id: 'barber-1',
+      name: 'Juco',
+      bio: 'Especialista en cortes premium y estilismo masculino.',
+      avatarUrl: 'https://images.unsplash.com/photo-1599351431247-f10b21817021?auto=format&fit=crop&q=80',
     },
   });
 
-  const serviceCorte = await prisma.service.create({
-    data: {
-      tenantId: tenant.id,
-      name: 'Corte Clásico',
+  // 2. Create Services
+  const services = [
+    {
+      id: 'service-1',
+      name: 'Corte de Precisión',
+      description: 'Corte artesanal con acabado detallado.',
+      durationMinutes: 45,
+      price: 45,
+      barberId: barber.id,
+    },
+    {
+      id: 'service-2',
+      name: 'Escultura de Barba',
+      description: 'Diseño y perfilado de barba con ritual de toalla caliente.',
       durationMinutes: 30,
-      price: 5000,
+      price: 30,
+      barberId: barber.id,
     },
-  });
-
-  const serviceBarba = await prisma.service.create({
-    data: {
-      tenantId: tenant.id,
-      name: 'Arreglo de Barba',
-      durationMinutes: 20,
-      price: 3000,
+    {
+      id: 'service-3',
+      name: 'El Ritual Vaon',
+      description: 'Experiencia completa: Corte + Barba + Tratamiento facial.',
+      durationMinutes: 75,
+      price: 70,
+      barberId: barber.id,
     },
-  });
+  ];
 
-  await prisma.barberService.createMany({
-    data: [
-      { barberId: barber.id, serviceId: serviceCorte.id },
-      { barberId: barber.id, serviceId: serviceBarba.id },
-    ],
-  });
-
-  // Schedule Mon-Fri 09:00 - 18:00
-  const days: any[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY'];
-  for (const day of days) {
-    await prisma.availability.upsert({
-      where: { barberId_dayOfWeek: { barberId: barber.id, dayOfWeek: day } },
+  for (const service of services) {
+    await prisma.service.upsert({
+      where: { id: service.id },
       update: {},
-      create: {
-        barberId: barber.id,
-        dayOfWeek: day,
-        startTime: '09:00',
-        endTime: '18:00',
-      },
+      create: service,
     });
   }
 

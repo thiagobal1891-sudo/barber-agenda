@@ -6,38 +6,43 @@ import { CreateServiceDto, UpdateServiceDto } from './dto/service.dto';
 export class ServicesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(tenantId: string, includeInactive = false) {
+  async findAll() {
     return this.prisma.service.findMany({
-      where: {
-        tenantId,
-        ...(!includeInactive && { isActive: true }),
-      },
-      orderBy: { name: 'asc' },
+      where: { isActive: true },
+      include: { barber: true },
     });
   }
 
-  async findOne(tenantId: string, id: string) {
-    const service = await this.prisma.service.findFirst({
-      where: { id, tenantId },
+  async findOne(id: string) {
+    const service = await this.prisma.service.findUnique({
+      where: { id },
+      include: { barber: true },
     });
-    if (!service) throw new NotFoundException(`Service ${id} not found`);
+
+    if (!service) {
+      throw new NotFoundException(`Service ${id} not found`);
+    }
+
     return service;
   }
 
-  async create(tenantId: string, dto: CreateServiceDto) {
+  async create(dto: CreateServiceDto) {
     return this.prisma.service.create({
-      data: { tenantId, ...dto },
+      data: dto,
     });
   }
 
-  async update(tenantId: string, id: string, dto: UpdateServiceDto) {
-    await this.findOne(tenantId, id);
-    return this.prisma.service.update({ where: { id }, data: dto });
+  async update(id: string, dto: UpdateServiceDto) {
+    await this.findOne(id);
+    return this.prisma.service.update({
+      where: { id },
+      data: dto,
+    });
   }
 
-  async remove(tenantId: string, id: string) {
-    await this.findOne(tenantId, id);
-    await this.prisma.service.update({
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.service.update({
       where: { id },
       data: { isActive: false },
     });
