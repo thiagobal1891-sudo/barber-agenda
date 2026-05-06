@@ -5,11 +5,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { AvailabilityService } from '../availability/availability.service';
 import { CreateAppointmentDto } from './dto/appointment.dto';
 import { AppointmentCreatedEvent } from '../events/appointment.events';
-import { addMinutes } from '../../../common/utils/date.utils';
+import { addMinutes } from '../../common/utils/date.utils';
 import dayjs from 'dayjs';
 
 @Injectable()
@@ -74,7 +74,7 @@ export class AppointmentsService {
     const dateStr = dayjs(startTime).format('YYYY-MM-DD');
 
     // 3. Begin Transaction for booking
-    const appointment = await this.prisma.$transaction(async (tx) => {
+    const appointment = await this.prisma.$transaction(async (tx: any) => {
       // Upsert client
       const client = await tx.client.upsert({
         where: { tenantId_phone: { tenantId, phone: dto.clientPhone } },

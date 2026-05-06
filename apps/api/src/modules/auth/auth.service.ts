@@ -7,12 +7,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { RegisterDto, LoginDto, RefreshTokenDto } from '../dto/auth.dto';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { RegisterDto, LoginDto, RefreshTokenDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { addDays } from '../../../common/utils/date.utils';
-import { JwtPayload } from '../strategies/jwt.strategy';
+import { addDays } from '../../common/utils/date.utils';
+import { JwtPayload } from '../../@types/shared';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +22,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   // ── Register new tenant + admin user ───────────────────────────────────────
 
@@ -38,7 +38,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     // Create tenant + admin user in a single transaction
-    const result = await this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx: any) => {
       const tenant = await tx.tenant.create({
         data: {
           slug: dto.slug,

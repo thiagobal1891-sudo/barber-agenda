@@ -1,6 +1,6 @@
 import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import Stripe from 'stripe';
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 
@@ -16,7 +16,7 @@ export class PaymentsService {
   ) {
     const stripeKey = this.configService.get<string>('payment.stripe.secretKey');
     if (stripeKey) {
-      this.stripe = new Stripe(stripeKey, { apiVersion: '2025-01-27.acacia' });
+      this.stripe = new Stripe(stripeKey, { apiVersion: '2025-02-24.acacia' as any });
     }
 
     const mpToken = this.configService.get<string>('payment.mercadopago.accessToken');

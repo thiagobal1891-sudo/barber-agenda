@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { PrismaService } from '../../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
 import { NotificationsService } from '../notifications.service';
 import { AppointmentCreatedEvent } from '../../events/appointment.events';
 import dayjs from 'dayjs';

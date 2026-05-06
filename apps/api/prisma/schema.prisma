@@ -8,69 +8,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ENUMS
-// ─────────────────────────────────────────────────────────────────────────────
-
-enum UserRole {
-  ADMIN
-  BARBER
-}
-
-enum AppointmentStatus {
-  PENDING
-  CONFIRMED
-  COMPLETED
-  CANCELLED
-  NO_SHOW
-}
-
-enum PaymentStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  REFUNDED
-}
-
-enum PaymentGateway {
-  MERCADOPAGO
-  STRIPE
-  CASH
-}
-
-enum DayOfWeek {
-  MONDAY
-  TUESDAY
-  WEDNESDAY
-  THURSDAY
-  FRIDAY
-  SATURDAY
-  SUNDAY
-}
-
-enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
-}
-
-enum NotificationChannel {
-  EMAIL
-  WHATSAPP
-}
-
-enum NotificationType {
-  APPOINTMENT_CONFIRMATION
-  APPOINTMENT_REMINDER_24H
-  APPOINTMENT_REMINDER_2H
-  APPOINTMENT_CANCELLED
-  PAYMENT_COMPLETED
-}
+// Enums are handled as Strings in SQLite schema
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TENANT — Barbershop
@@ -111,7 +53,7 @@ model User {
   passwordHash String
   firstName    String
   lastName     String
-  role         UserRole @default(BARBER)
+  role         String @default("BARBER")
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -178,7 +120,7 @@ model Service {
   name            String
   description     String?
   durationMinutes Int
-  price           Decimal @db.Decimal(10, 2)
+  price           Float
   isActive        Boolean @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -213,7 +155,7 @@ model BarberService {
 model Availability {
   id        String    @id @default(uuid())
   barberId  String
-  dayOfWeek DayOfWeek
+  dayOfWeek String
   startTime String    // "HH:mm" format (e.g. "09:00")
   endTime   String    // "HH:mm" format (e.g. "18:00")
   createdAt DateTime  @default(now())
@@ -260,7 +202,7 @@ model Appointment {
   clientId  String
   startTime DateTime
   endTime   DateTime
-  status    AppointmentStatus @default(PENDING)
+  status    String @default("PENDING")
   notes     String?
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt
@@ -288,10 +230,10 @@ model Payment {
   id                String         @id @default(uuid())
   tenantId          String
   appointmentId     String         @unique
-  amount            Decimal        @db.Decimal(10, 2)
+  amount            Float
   currency          String         @default("ARS")
-  status            PaymentStatus  @default(PENDING)
-  gateway           PaymentGateway @default(CASH)
+  status            String  @default("PENDING")
+  gateway           String  @default("CASH")
   gatewayPaymentId  String?        // external ID from MercadoPago/Stripe
   gatewayCheckoutUrl String?       // redirect URL for payment
   webhookData       Json?          // raw webhook payload for auditing
@@ -315,10 +257,10 @@ model Notification {
   id            String              @id @default(uuid())
   tenantId      String
   appointmentId String?
-  channel       NotificationChannel
-  type          NotificationType
+  channel       String
+  type          String
   recipient     String              // email or phone
-  status        NotificationStatus  @default(PENDING)
+  status        String  @default("PENDING")
   sentAt        DateTime?
   errorMessage  String?
   createdAt     DateTime            @default(now())

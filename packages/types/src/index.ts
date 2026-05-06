@@ -71,6 +71,7 @@ export interface BarberDto {
   bio?: string;
   avatarUrl?: string;
   isActive: boolean;
+  services?: any[];
 }
 
 export interface ServiceDto {

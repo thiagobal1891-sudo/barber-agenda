@@ -8,10 +8,7 @@
     "target": "ES2021",
     "sourceRoot": "src",
     "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "@barberos/types": ["../../packages/types/src/index.ts"]
-    }
+    "baseUrl": "."
   },
   "include": ["src/**/*", "prisma/seed.ts"],
   "exclude": ["node_modules", "dist"]

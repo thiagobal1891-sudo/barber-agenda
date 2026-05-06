@@ -3,7 +3,7 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 import { CreateBarberDto, UpdateBarberDto } from './dto/barber.dto';
 
 @Injectable()
@@ -45,17 +45,47 @@ export class BarbersService {
   }
 
   async create(tenantId: string, dto: CreateBarberDto) {
+    let targetUserId = dto.userId;
+
+    // If no userId provided, create a new user for this barber
+    if (!targetUserId) {
+      if (!dto.email) {
+        throw new ConflictException('Either userId or email must be provided');
+      }
+
+      // Check if user already exists
+      const existingUser = await this.prisma.user.findFirst({
+        where: { email: dto.email, tenantId },
+      });
+
+      if (existingUser) {
+        targetUserId = existingUser.id;
+      } else {
+        const newUser = await this.prisma.user.create({
+          data: {
+            tenantId,
+            email: dto.email,
+            passwordHash: '$2a$12$R.S.M.dummy.password.hash', // Should be changed on first login
+            firstName: dto.displayName.split(' ')[0],
+            lastName: dto.displayName.split(' ')[1] || '',
+            role: 'BARBER',
+          },
+        });
+        targetUserId = newUser.id;
+      }
+    }
+
     // Verify user belongs to tenant
     const user = await this.prisma.user.findFirst({
-      where: { id: dto.userId, tenantId },
+      where: { id: targetUserId, tenantId },
     });
     if (!user) {
-      throw new NotFoundException(`User ${dto.userId} not found in this tenant`);
+      throw new NotFoundException(`User ${targetUserId} not found in this tenant`);
     }
 
     // Verify no barber profile exists for user
     const existing = await this.prisma.barber.findUnique({
-      where: { userId: dto.userId },
+      where: { userId: targetUserId },
     });
     if (existing) {
       throw new ConflictException('User already has a barber profile');
@@ -64,7 +94,7 @@ export class BarbersService {
     const barber = await this.prisma.barber.create({
       data: {
         tenantId,
-        userId: dto.userId,
+        userId: targetUserId,
         displayName: dto.displayName,
         bio: dto.bio,
         avatarUrl: dto.avatarUrl,
@@ -85,7 +115,7 @@ export class BarbersService {
   async update(tenantId: string, id: string, dto: UpdateBarberDto) {
     await this.findOne(tenantId, id); // verify exists
 
-    return this.prisma.$transaction(async (tx) => {
+    return this.prisma.$transaction(async (tx: any) => {
       if (dto.serviceIds !== undefined) {
         // Replace all service associations
         await tx.barberService.deleteMany({ where: { barberId: id } });

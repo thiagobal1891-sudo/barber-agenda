@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as sgMail from '@sendgrid/mail';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
+import sgMail from '@sendgrid/mail';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
 
 @Injectable()
 export class NotificationsService {

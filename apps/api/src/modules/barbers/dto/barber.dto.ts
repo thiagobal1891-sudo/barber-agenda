@@ -10,8 +10,13 @@ import {
 } from 'class-validator';
 
 export class CreateBarberDto {
+  @IsOptional()
   @IsUUID()
-  userId: string;
+  userId?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
 
   @IsString()
   @IsNotEmpty()

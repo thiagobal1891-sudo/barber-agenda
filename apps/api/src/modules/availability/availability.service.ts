@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { RedisService } from '../../../infrastructure/redis/redis.service';
+import { PrismaService } from '../../infrastructure/prisma/prisma.service';
+import { RedisService } from '../../infrastructure/redis/redis.service';
 import { ConfigService } from '@nestjs/config';
 import { SetAvailabilityDto } from './dto/availability.dto';
-import { addMinutes, parseTimeToMinutes } from '../../../common/utils/date.utils';
+import { addMinutes, parseTimeToMinutes } from '../../common/utils/date.utils';
 import { SlotDto } from '@barberos/types';
 import dayjs from 'dayjs';
 
@@ -63,7 +63,7 @@ export class AvailabilityService {
 
     // Use minimum service duration as slot interval (typically 30 min)
     const slotIntervalMinutes = barberServices.length > 0
-      ? Math.min(...barberServices.map((bs) => bs.service.durationMinutes))
+      ? Math.min(...barberServices.map((bs: any) => bs.service.durationMinutes))
       : 30;
 
     // Get existing appointments for that date
@@ -97,7 +97,7 @@ export class AvailabilityService {
       const isPast = dayjs(slotStart).isBefore(now);
 
       // Check if slot overlaps with any existing appointment
-      const isBooked = existingAppointments.some((appt) => {
+      const isBooked = existingAppointments.some((appt: any) => {
         const apptStart = dayjs(appt.startTime);
         const apptEnd = dayjs(appt.endTime);
         const slotStartDj = dayjs(slotStart);
