@@ -35,11 +35,7 @@ async function bootstrap() {
 
   // ── CORS ────────────────────────────────────────────────────────────────────
   app.enableCors({
-    origin: [
-      frontendUrl, 
-      /\.barberos\.app$/,
-      'https://TU-FRONTEND.vercel.app'
-    ],
+    origin: [frontendUrl, /\.barberos\.app$/],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
