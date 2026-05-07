@@ -15,6 +15,8 @@ const expressApp = express();
 let server: any;
 
 async function bootstrap() {
+  console.log('[Bootstrap] Starting...');
+  
   const app = await NestFactory.create(
     AppModule,
     new ExpressAdapter(expressApp),
@@ -61,6 +63,8 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
 
   await app.init();
+  
+  console.log('[Bootstrap] NestJS initialized');
 
   return serverlessExpress({
     app: expressApp,
@@ -69,30 +73,29 @@ async function bootstrap() {
 
 export default async function handler(req: any, res: any) {
   try {
+    console.log(`[Handler] ${req.method} ${req.url}`);
+    
     if (!server) {
-      console.log('[Bootstrap] Starting NestJS app initialization...');
-      console.log('[Bootstrap] DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'NOT SET');
-      console.log('[Bootstrap] NODE_ENV:', process.env.NODE_ENV);
-      
+      console.log('[Handler] Bootstrapping NestJS...');
       server = await bootstrap();
-      
-      console.log('[Bootstrap] NestJS app initialized successfully');
+      console.log('[Handler] Bootstrap complete, handling request');
     }
 
-    return server(req, res);
+    return await server(req, res);
   } catch (error) {
-    const logger = new Logger('ServerlessHandler');
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : '';
     
-    console.error('[Handler Error] Message:', errorMessage);
-    console.error('[Handler Error] Stack:', errorStack);
-    logger.error('Handler error:', error);
-    
-    res.status(500).json({
-      statusCode: 500,
-      message: 'Internal server error',
-      error: process.env.NODE_ENV === 'development' ? errorMessage : 'Internal Server Error',
-    });
+    console.error('[Handler ERROR]', errorMessage);
+    console.error('[Handler STACK]', errorStack);
+
+    if (!res.headersSent) {
+      res.status(500).json({
+        statusCode: 500,
+        message: 'Internal server error',
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 }
