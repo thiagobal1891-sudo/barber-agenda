@@ -2,18 +2,18 @@
   "name": "@barberos/api",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "build": "prisma generate && nest build",
-  "start:prod": "node dist/main",
-  "start": "node dist/main",
-  "dev": "nest start --watch",
-  "lint": "eslint src/**",
-  "test": "jest",
-  "test:e2e": "jest --config jest-e2e.json",
-  "prisma:generate": "prisma generate",
-  "prisma:migrate": "prisma migrate dev",
-  "prisma:seed": "ts-node prisma/seed.ts"
-},
+  "scripts": {
+    "build": "prisma generate && npx nest build",
+    "start": "node dist/main.js",
+    "start:prod": "node dist/main.js",
+    "dev": "nest start --watch",
+    "lint": "eslint \"src/**/*.ts\"",
+    "test": "jest",
+    "test:e2e": "jest --config jest-e2e.json",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "ts-node prisma/seed.ts"
+  },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
     "@nestjs/config": "^3.3.0",
@@ -42,7 +42,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.4.9",
+    "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^10.2.3",
     "@nestjs/testing": "^10.4.15",
     "@types/bcryptjs": "^2.4.6",
