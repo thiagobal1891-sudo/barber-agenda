@@ -5,7 +5,7 @@
   "scripts": {
     "build": "prisma generate && npx nest build",
     "start": "node dist/src/main.js",
-    "start:prod": "node dist/src/main.js",
+    "start:prod": "node dist/src/main.js 2>&1 || true",
     "dev": "npx nest start --watch",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
