@@ -20,11 +20,20 @@ export async function createApp() {
   );
 
   app.enableCors({
-    origin: [
-      frontendUrl,
-      /\.barberos\.app$/,
-      'https://TU-FRONTEND.vercel.app',
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        frontendUrl,
+        'https://TU-FRONTEND.vercel.app', // Mantener como fallback si es necesario
+      ];
+      
+      // Permitir peticiones sin origen (como apps móviles o curl) 
+      // y verificar contra la lista permitida o regex de subdominios
+      if (!origin || allowedOrigins.includes(origin) || /\.barberos\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

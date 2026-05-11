@@ -6,6 +6,7 @@
     "build": "prisma generate && npx nest build",
     "start": "node dist/src/main.js",
     "start:prod": "node dist/src/main.js",
+    "prisma:deploy": "prisma migrate deploy && npm run prisma:seed",
     "dev": "npx nest start --watch",
     "lint": "eslint \"src/**/*.ts\"",
     "test": "jest",
