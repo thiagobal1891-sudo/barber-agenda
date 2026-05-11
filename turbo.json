@@ -8,9 +8,18 @@
         "DATABASE_URL",
         "DIRECT_URL",
         "JWT_SECRET",
+        "JWT_REFRESH_SECRET",
+        "JWT_ACCESS_EXPIRATION",
+        "JWT_REFRESH_EXPIRATION",
         "FRONTEND_URL",
+        "APP_URL",
         "SENDGRID_API_KEY",
-        "REDIS_URL"
+        "SENDGRID_FROM_EMAIL",
+        "SENDGRID_FROM_NAME",
+        "REDIS_URL",
+        "THROTTLE_TTL",
+        "THROTTLE_LIMIT",
+        "NODE_ENV"
       ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
