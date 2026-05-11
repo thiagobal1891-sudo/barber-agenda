@@ -31,11 +31,19 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: [
-      frontendUrl,
-      /\.barberos\.app$/,
-      'https://TU-FRONTEND.vercel.app',
-    ],
+    origin: (origin, callback) => {
+      const configService = app.get(ConfigService);
+      const frontendUrl = configService.get<string>('FRONTEND_URL');
+      const allowedOrigins = [
+        frontendUrl,
+        'https://TU-FRONTEND.vercel.app',
+      ];
+      if (!origin || allowedOrigins.includes(origin) || /\.barberos\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
