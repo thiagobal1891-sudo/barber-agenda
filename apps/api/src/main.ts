@@ -19,9 +19,9 @@ export async function createApp() {
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = [
-        frontendUrl,
-        'https://TU-FRONTEND.vercel.app',
-      ];
+  frontendUrl,
+  'https://juco-barber-api.vercel.app',
+];
       if (!origin || allowedOrigins.includes(origin) || /\.barberos\.app$/.test(origin)) {
         callback(null, true);
       } else {
