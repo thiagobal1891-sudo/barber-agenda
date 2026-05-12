@@ -12,13 +12,14 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "postinstall": "node_modules/.bin/prisma generate --schema=apps/api/prisma/schema.prisma",
+    "prepare": "prisma generate --schema=apps/api/prisma/schema.prisma",
     "db:generate": "cd apps/api && npx prisma generate",
     "db:migrate": "cd apps/api && npx prisma migrate dev",
     "db:studio": "cd apps/api && npx prisma studio"
   },
   "devDependencies": {
     "prettier": "^3.4.2",
+    "prisma": "^6.19.3",
     "turbo": "^2.3.3"
   },
   "engines": {
@@ -31,7 +32,6 @@
     "@nestjs/platform-express": "^11.1.19",
     "@supabase/supabase-js": "^2.105.3",
     "express": "^5.2.1",
-    "prisma": "^6.19.3",
     "serverless-http": "^4.0.0"
   }
 }
